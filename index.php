@@ -47,3 +47,4 @@ echo "<tr> <td>Password (for testing)</td><td>". $row['password']."</td></tr>";
 </table>
 </body>
 </html>
+    
