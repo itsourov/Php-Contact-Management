@@ -1,9 +1,16 @@
 <?php
 
 $servername = "localhost";
-$username = "root";
+$sqlusername = "root";
 $password = "";
 $dbname = "bondhu";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $sqlusername, $password, $dbname);
+
+if (isset($_SESSION['login_user'])) {
+    $username =$_SESSION['login_user'];
+}
+
+
+$siteUrl ='http://localhost/www/Bondhu/';
