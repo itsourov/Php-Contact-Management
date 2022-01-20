@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/sourovne/project1.sourov.net/
+    - /bin/cp * $DEPLOYPATH
+    
