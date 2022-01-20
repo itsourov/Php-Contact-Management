@@ -1,37 +1,38 @@
 <?php
-  session_start();  
+session_start();
 include 'config.php';
 
-if ($_GET['int'] == "checkUsername") {
-    $checkName = $_GET['checkName'];
-    $sql = "SELECT username FROM `users`  WHERE `username`= '$checkName'";
-    $result = mysqli_query($conn, $sql);
-    if ($_GET['checkName'] == "") {
-        $available = false;
-        $massage = "Username cant be empty";
-    } elseif (strpos($_GET['checkName'], ' ') !== false) {
-        $available = false;
-        $massage = "Username cant contain space";
-    } elseif (mysqli_num_rows($result) != 1) {
-        $available = true;
-        $massage = "the username is available to use";
-    } else {
-        $available = false;
-        $massage = "the username is not available";
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    if ($_GET['int'] == "checkUsername") {
+        $checkName = $_GET['checkName'];
+        $sql = "SELECT username FROM `users`  WHERE `username`= '$checkName'";
+        $result = mysqli_query($conn, $sql);
+        if ($_GET['checkName'] == "") {
+            $available = false;
+            $massage = "Username cant be empty";
+        } elseif (strpos($_GET['checkName'], ' ') !== false) {
+            $available = false;
+            $massage = "Username cant contain space";
+        } elseif (mysqli_num_rows($result) != 1) {
+            $available = true;
+            $massage = "the username is available to use";
+        } else {
+            $available = false;
+            $massage = "the username is not available";
+        }
+        $myObj = new stdClass();
+        $myObj->available = $available;
+        $myObj->massaage = $massage;
+        $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo $myJSON;
     }
-    $myObj = new stdClass();
-    $myObj->available = $available;
-    $myObj->massaage = $massage;
-    $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    echo $myJSON;
 }
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($_POST['int'] == "sign-up") {
 
-      
+
 
         // initializing variables
         $username = "";
@@ -115,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif ($_POST['int'] == "log-in") {
         $errors = array();
 
-        $db= $conn;
+        $db = $conn;
         $username = mysqli_real_escape_string($db, $_POST['username']);
         $password = mysqli_real_escape_string($db, $_POST['password']);
 
@@ -141,6 +142,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo $myJSON;
             } else {
                 array_push($errors, "Wrong username/password combination");
+            }
+        }
+        if (count($errors) > 0) {
+
+
+            $myObj = new stdClass();
+            $myObj->status = false;
+            $myObj->errors = $errors;
+            $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            echo $myJSON;
+        }
+    } elseif ($_POST['int'] == "reset-pass") {
+        $db = $conn;
+        $errors = array();
+        
+        $username = mysqli_real_escape_string($db, $_POST['username']);
+
+        if (empty($username)) {
+            array_push($errors, "Username is required");
+        }
+
+
+        if (count($errors) == 0) {
+        
+            $rand = rand();
+
+            $query = "SELECT * FROM users WHERE username='$username'";
+            $results = mysqli_query($db, $query);
+            if (mysqli_num_rows($results) == 1) {
+                $result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM `users`  WHERE `username`= '$username'"));
+            
+                $useridres =$result['id'];
+
+                $tokenUpdateSql = "UPDATE `users` SET `token` = '$rand' WHERE `users`.`id` = $useridres";
+
+
+                if ($conn->query($tokenUpdateSql) === TRUE) {
+                  
+                    
+    
+                    $myObj = new stdClass();
+                    $myObj->status = true;
+                    $myObj->massage = "Password reset email was sent to your email ". $result['email'];
+                    $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                    echo $myJSON;
+                } else {
+                    $massage = "Error: " . $tokenUpdateSql . "<br>" . $conn->error;
+                    array_push($errors, $massage);
+                }
+
+
+              
+            } else {
+                array_push($errors, "username dont exists");
             }
         }
         if (count($errors) > 0) {

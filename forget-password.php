@@ -1,18 +1,3 @@
-<?php
-session_start();
-include 'config.php';
-
-if (isset($userid)) {
-    header("Location: index.php");
-    exit();
-} else {
-    //stay logging in
-}
-
-
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -89,26 +74,43 @@ if (isset($userid)) {
         <div class="alert alert-primary" role="alert" id="alert">
 
         </div>
-        <form enctype="multipart/form-data" id="logInForm" onsubmit="logIn(); return false;">
-            <input class=" mb-3" type="text" placeholder="Username" name="username" required>
-            <input class=" mb-3 " type="password" placeholder="Password" name="password" required>
-            <input type="hidden" name="int" value="log-in">
-            <p class="message text-end"><a href="forget-password.php">Forgot password?</a></p>
-            <button class="btn mb-3" onclick="logIn()" type="submit">Log in</button>
+        <h3 class="title mb-3">Reset Password</h3>
+        <form enctype="multipart/form-data" id="forgetPassForm" onsubmit="reqReset(); return false;">
+            <input class=" mb-3" type="text" placeholder="Username" name="username" >
+            <input type="hidden" name="int" value="reset-pass">
+            <button class="btn mb-3" onclick="reqReset()" type="button">Request Reset</button>
         </form>
-        <p class="message">Not registered? <a href="sign-up.php">Create an account</a></p>
+
     </div>
 
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
     </style>
-<script>
-    var alert = document.getElementById('alert');
-    alert.style.display = "none"
+    <script>
+        var alert = document.getElementById('alert');
+        alert.style.display = "none"
 
-    function logIn(){
-        var data = new FormData(document.getElementById("logInForm"));
+
+
+        function fadeout(element) { // 1
+            element.style.opacity = 1; // 2
+            let hidden_process = window.setInterval(function() { // 3
+                if (element.style.opacity > 0) { // 4
+                    element.style.opacity = parseFloat(element.style.opacity - 0.01).toFixed(2); // 5 
+                } else {
+                    element.style.display = 'none'; // 6 
+                    element.style.opacity =1;
+                    console.log('1');
+                    clearInterval(hidden_process);
+                }
+            }, 4);
+
+
+        };
+
+        function reqReset() {
+            var data = new FormData(document.getElementById("forgetPassForm"));
 
 
             var xhr = new XMLHttpRequest();
@@ -122,13 +124,12 @@ if (isset($userid)) {
                 alert.style.display = "block"
                 if (res.status) {
                     alert.innerHTML = res.massage
-                    location.reload();
                 } else {
                     var errorText = ""
                     res.errors.forEach(function(data, index) {
-                      
-                        errorText = errorText+ "*"+data+"<br>"
-                    
+
+                        errorText = errorText + "*" + data + "<br>"
+
                     });
                     alert.innerHTML = errorText
                 }
@@ -136,12 +137,12 @@ if (isset($userid)) {
 
 
                 setTimeout(function() {
-                    alert.style.display = "none"
+                    fadeout(alert);
                 }, 5000);
             };
             xhr.send(data);
-    }
-</script>
+        }
+    </script>
 
 </body>
 
