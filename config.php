@@ -1,9 +1,9 @@
 <?php
 
 $servername = "localhost";
-$sqlusername = "sohojco_php";
+$sqlusername = "sourovne_project1";
 $password = "power of 12";
-$dbname = "sohojco_php";
+$dbname = "sourovne_project1";
 
 // Create connection
 $conn = new mysqli($servername, $sqlusername, $password, $dbname);
@@ -16,6 +16,6 @@ if (isset($_SESSION['login_user'])) {
 
 
 
-$siteUrl = 'http://php.sohoj.co/';
+$siteUrl = 'https://project1.sourov.net/';
 
 ?>
