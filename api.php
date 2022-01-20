@@ -55,16 +55,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
         echo $myJSON;
     } elseif ($_GET['int'] == "checkUsername") {
+        
         $checkName = $_GET['checkName'];
         $sql = "SELECT username FROM `users`  WHERE `username`= '$checkName'";
         $result = mysqli_query($conn, $sql);
-        if ($_GET['checkName'] =="") {
+        if ($_GET['checkName'] == "") {
             $available = false;
             $massage = "Username cant be empty";
-        }elseif (  mysqli_num_rows($result) != 1 ||  $_GET['checkName']==$username) {
+        } elseif (strpos($_GET['checkName'], ' ') !== false) {
+            $available = false;
+            $massage = "Username cant contain space";
+        } elseif (mysqli_num_rows($result) != 1 ||  $_GET['checkName'] == $username) {
             $available = true;
             $massage = "the username is available to use";
-
         } else {
             $available = false;
             $massage = "the username is not available";
@@ -74,5 +77,43 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $myObj->massaage = $massage;
         $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         echo $myJSON;
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+
+    $target_dir = "uploads/".$username."/";
+    if (!file_exists($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+
+    if ($_FILES['file']['error'] > 0) {
+        echo 'Error: ' . $_FILES['file']['error'] . '<br>';
+    } else {
+
+        $filepath =  $target_dir."profile_pic_". rand() . $_FILES['file']['name'];
+        
+        if (move_uploaded_file($_FILES['file']['tmp_name'],$filepath)) {
+        
+           
+
+            $sql = "UPDATE `users` SET `profile_pic` = '$filepath' WHERE `username`= '$username'";
+
+            if ($conn->query($sql) === TRUE) {
+                $massage = "Image Uploaded successfuly";
+                $success = true;
+            } else {
+                $massage = "Error: " . $sql . "<br>" . $conn->error;
+                $success = false;
+            }
+
+            $myObj = new stdClass();
+            $myObj->massage = $massage;
+            $myObj->success = $success;
+
+            $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            echo $myJSON;
+        }
     }
 }

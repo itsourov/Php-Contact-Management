@@ -13,4 +13,4 @@ if (isset($_SESSION['login_user'])) {
 }
 
 
-$siteUrl ='http://localhost/www/Bondhu/';
+$siteUrl ='http://localhost/www/clean/';

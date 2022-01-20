@@ -31,9 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['login_user'] =  $row["username"];
 
 
-    echo "Wellcome " . $row["full_name"];
 
-    header("Location: ./index.php");
+    header("Location: index.php");
     exit();
   } else if (mysqli_num_rows($result) == 0) {
     echo "0 results";

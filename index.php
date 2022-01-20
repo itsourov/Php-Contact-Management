@@ -36,9 +36,15 @@ if ($_SESSION['login_user'] == null) {
     </div>
     <div class="container white-box ">
         <div class="image-box  mx-auto position-relative">
-            <img class="img-fluid shadow" src="<?php echo $siteUrl . $row['profile_pic']; ?>" alt="">
+            <img class="img-fluid shadow" id="blah" src="<?php echo $siteUrl . $row['profile_pic']; ?>" alt="">
+            <div id="spinner" class="spinner-grow text-secondary loader img-fluid" role="status" style="display: none;">
 
-            <button class="upload-btn btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-upload"></i></button>
+            </div>
+            <div class="upload-btn" style="display: none;">
+                <input type="file" accept="image/*" id="imgInp" name="fileToUpload" multiple>
+            </div>
+
+
 
             <button onclick="enableEdit()" class="edit-btn btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button>
         </div>
@@ -46,17 +52,18 @@ if ($_SESSION['login_user'] == null) {
             <h3 class="title"><?php echo  $row['full_name']; ?></h3>
             <p><?php echo  $row['username']; ?></p>
         </div>
-        <form action="" method="get" id="info-table">
+
+        <form id="info-table" enctype="multipart/form-data">
 
             <table class="mx-auto table table-striped info-table text-start">
 
                 <tr>
                     <td>Full Name</td>
-                    <td><input type="text" value="<?php echo $row['full_name']; ?> " disabled></td>
+                    <td><input type="text" name="full_name" value="<?php echo $row['full_name']; ?> " disabled></td>
                 </tr>
                 <tr>
                     <td>Username</td>
-                    <td><input type="text" id="username" value="<?php echo  $row['username']; ?>" disabled>
+                    <td><input type="text" id="username" name="username" value="<?php echo  $row['username']; ?>" disabled>
                         <div class="spinner-border text-info" id="spinner" role="status" style="display: none;">
 
                         </div>
@@ -71,15 +78,15 @@ if ($_SESSION['login_user'] == null) {
 
                 <tr>
                     <td>Date of birth</td>
-                    <td><input type="date" value="<?php echo $row['dob']; ?>" disabled></td>
+                    <td><input type="date" name="dob" value="<?php echo $row['dob']; ?>" disabled></td>
                 </tr>
                 <tr>
                     <td>Number</td>
-                    <td><input type="text" value="<?php echo $row['number']; ?> " disabled></td>
+                    <td><input type="text" name="number" value="<?php echo $row['number']; ?> " disabled></td>
                 </tr>
                 <tr>
                     <td>Emaile</td>
-                    <td><input type="text" value="<?php echo $row['email']; ?> " disabled></td>
+                    <td><input type="text" name="email" value="<?php echo $row['email']; ?> " disabled></td>
                 </tr>
                 <tr>
                     <td>Number of friends</td>
@@ -92,13 +99,14 @@ if ($_SESSION['login_user'] == null) {
             <div id="buttons" class=" mx-auto text-center" style="display: none;">
 
                 <button type="button" class="btn btn-warning m-1" onclick="disableEdit()">Cancel</button>
-                <button type="button" class="btn btn-success m-1" id="submit">Save</button>
+                <button type="button" class="btn btn-success m-1" id="upload" value="Save">Save</button>
 
 
             </div>
         </form>
 
     </div>
+
     <style>
         body {
             background-color: aqua;
@@ -125,12 +133,14 @@ if ($_SESSION['login_user'] == null) {
             max-height: 160px;
             max-width: 160px;
 
-
         }
 
         .image-box img {
             border-radius: 50%;
             margin-top: -80px;
+            height: 160px;
+            width: 160px;
+            object-fit: cover;
 
         }
 
@@ -165,13 +175,35 @@ if ($_SESSION['login_user'] == null) {
             bottom: 35px;
             right: -40px;
         }
-        .upload-btn{
+
+        .upload-btn {
+            background: aqua;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             position: absolute;
-            height: 30px;
-            width: 30px;
             bottom: 0;
             right: 0;
-        
+        }
+
+        .upload-btn input {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+
+
+        .loader {
+            position: absolute;
+            border-radius: 50%;
+            margin-top: -80px;
+            height: 160px;
+            width: 160px;
+            bottom: 0;
+            right: 0;
+
+
 
         }
     </style>
@@ -184,6 +216,8 @@ if ($_SESSION['login_user'] == null) {
             $("input").prop('disabled', false);
 
             $("#buttons").css("display", "block");
+            $(".upload-btn").css("display", "block");
+
 
         }
 
@@ -191,6 +225,8 @@ if ($_SESSION['login_user'] == null) {
             $("input").prop('disabled', true);
 
             $("#buttons").css("display", "none");
+            $(".upload-btn").css("display", "none");
+            $("#spinner").css("display", "None");
             $("#info-table")[0].reset();
             $('#username').attr("class", "");
 
@@ -221,7 +257,49 @@ if ($_SESSION['login_user'] == null) {
 
         });
 
-      
+        var imageSelected = false;
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $('#blah').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+                $("#spinner").css("display", "block");
+                imageSelected = true;
+            }
+        }
+
+        $("#imgInp").change(function() {
+            readURL(this);
+
+            var file_data = $('#imgInp').prop('files')[0];
+            var form_data = new FormData();
+            form_data.append('file', file_data);
+
+            $.ajax({
+                url: 'api.php', // point to server-side PHP script 
+                dataType: 'json', // what to expect back from the PHP script, if anything
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+             
+                success: function(output) {
+                    alert(output.massage); // display response from the PHP script, if any
+                    $("#spinner").css("display", "none");
+                }
+            });
+            $('#imgInp').val(''); /* Clear the file container */
+        });
+
+        $('#upload').on('click', function() {
+
+        });
     </script>
 
 </body>
