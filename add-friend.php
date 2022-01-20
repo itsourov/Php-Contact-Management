@@ -18,7 +18,7 @@ if ($_SESSION['login_user'] == null) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
        
 
-    <title>Add Friends no css</title>
+    <title>Add Friends no css 2</title>
 </head>
 
 <body>
