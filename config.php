@@ -16,6 +16,6 @@ if (isset($_SESSION['login_user'])) {
 
 
 
-$siteUrl = 'https://project1.sourov.net/';
+$siteUrl = 'https://p1.sourov.net/';
 
 ?>
