@@ -1,16 +1,16 @@
 on: push
-name: 🚀 Deploy website on pusha
+name: Publish Website
 jobs:
-  web-deploy:
-    name: 🎉 Deploya
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v2
-    
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.2.0
-      with:
-        server: ftp.sourov.net
-        username: git@sourov.net
-        password: ${{ secrets.ftp_password }}
+    - uses: actions/checkout@master
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@2.0.0
+      env:
+        FTP_SERVER: ftp.samkirkland.com
+        FTP_USERNAME: myFtpUserName
+        FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        ARGS: --delete
+        # --delete arg will delete files on the server if you've deleted them in git
