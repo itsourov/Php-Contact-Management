@@ -93,6 +93,7 @@ if (isset($userid)) {
             <input class=" mb-3" type="text" placeholder="Username" name="username" required>
             <input class=" mb-3 " type="password" placeholder="Password" name="password" required>
             <input type="hidden" name="int" value="log-in">
+            <p class="message"><a href="sign-up.php">Forgot password?</a></p>
             <button class="btn mb-3" onclick="logIn()" type="button">Log in</button>
         </form>
         <p class="message">Not registered? <a href="sign-up.php">Create an account</a></p>
