@@ -8,11 +8,7 @@ if (isset($userid)) {
 } else {
     //stay logging in
 }
-
-
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,20 +36,11 @@ if (isset($userid)) {
 
 
         input {
-            outline: 0;
-            background: #f2f2f2;
             width: 100%;
-            border: 0;
             border-radius: 5px;
-            margin: 0 0 15px;
             padding: 15px;
-            box-sizing: border-box;
             font-size: 14px;
             font-family: 'Comfortaa', cursive;
-        }
-
-        input:focus {
-            background: #dbdbdb;
         }
 
 
@@ -89,25 +76,63 @@ if (isset($userid)) {
         <div class="alert alert-primary" role="alert" id="alert">
 
         </div>
-        <form enctype="multipart/form-data" id="logInForm">
-            <input class=" mb-3" type="text" placeholder="Username" name="username" required>
-            <input class=" mb-3 " type="password" placeholder="Password" name="password" required>
-            <input type="hidden" name="int" value="log-in">
-            <button class="btn mb-3" onclick="logIn()" type="button">Log in</button>
+        <form enctype="multipart/form-data" id="signUpForm">
+            <input class="form-control mb-3" type="text" name="full_name" placeholder="Full Name" required>
+            <input class="form-control" type="text" placeholder="Username" id="username" name="username" onchange="checkUsername();" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" required>
+            <div class="valid-feedback" id="valid-feedback">
+            </div>
+            <div class="invalid-feedback" id="invalid-feedback">
+            </div>
+            <input class="form-control mb-3 mt-3" type="email" name="email" placeholder="Email" required>
+            <input class="form-control mb-3 " type="text" placeholder="new Password" name="password_1" required>
+            <input class="form-control mb-3 " type="text" placeholder="Confirm new Password" name="password_2" required>
+            <input type="hidden" name="int" value="sign-up">
+            <button class="btn" onclick="signUp()" type="button">Sign Up</button>
         </form>
-        <p class="message">Not registered? <a href="sign-up.php">Create an account</a></p>
+        <p class="message mt-3">Already have an account? <a href="login.php">Log in</a></p>
     </div>
 
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
     </style>
-<script>
-    var alert = document.getElementById('alert');
-    alert.style.display = "none"
 
-    function logIn(){
-        var data = new FormData(document.getElementById("logInForm"));
+
+    <script>
+        // username cheching system
+        var username = document.getElementById('username');
+
+        function checkUsername() {
+            username.classList.add("form-control");
+
+            fetch("public-api.php?int=checkUsername&checkName=" + username.value).then(function(response) {
+                return response.json();
+            }).then(function(data) {
+
+
+                if (data.available) {
+                    username.classList.remove("is-invalid");
+                    username.classList.add("is-valid");
+                    document.getElementById("valid-feedback").innerHTML = data.massaage;
+                } else {
+                    username.classList.remove("is-valid");
+                    username.classList.add("is-invalid");
+                    document.getElementById("invalid-feedback").innerHTML = data.massaage;
+                }
+
+
+            }).catch(function() {
+                console.log("Booo");
+            });
+
+
+        }
+
+        var alert = document.getElementById('alert');
+        alert.style.display = "none"
+
+        function signUp() {
+            var data = new FormData(document.getElementById("signUpForm"));
 
 
             var xhr = new XMLHttpRequest();
@@ -139,9 +164,8 @@ if (isset($userid)) {
                 }, 5000);
             };
             xhr.send(data);
-    }
-</script>
-
+        }
+    </script>
 </body>
 
 </html>

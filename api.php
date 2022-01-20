@@ -11,51 +11,7 @@ if ($_SESSION['login_user'] == null) {
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
-
-    if ($_GET['int'] == "add") {
-        $name = mysqli_real_escape_string($conn, $_POST['name']);
-        $date = mysqli_real_escape_string($conn, $_POST['date']);
-        $number = mysqli_real_escape_string($conn, $_POST['number']);
-
-
-        $sql = "INSERT INTO `contacts`( `Name`, `number`, `date_of_birth`, `parent_user`) VALUES ('$name','$number','$date','$username')";
-
-        if ($conn->query($sql) === TRUE) {
-            $massage = "Contact added successfuly";
-            $success = true;
-        } else {
-            $massage = "Error: " . $sql . "<br>" . $conn->error;
-            $success = false;
-        }
-
-        $myObj = new stdClass();
-        $myObj->massage = $massage;
-        $myObj->success = $success;
-
-
-        $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-        echo $myJSON;
-    } elseif ($_GET['int'] == "dashinfo") {
-
-        $sql = "SELECT * FROM `users`";
-        $result = mysqli_query($conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-
-
-
-
-        $myObj = new stdClass();
-        $myObj->username = $row['username'];
-        $myObj->fullName = $row['full_name'];
-        $myObj->numberOfFriends = mysqli_num_rows(mysqli_query($conn, "SELECT id FROM `contacts` WHERE `parent_user`= '$username'"));
-
-
-        $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-        echo $myJSON;
-    } elseif ($_GET['int'] == "checkUsername") {
-        
+    if ($_GET['int'] == "checkUsername") {
         $checkName = $_GET['checkName'];
         $sql = "SELECT username FROM `users`  WHERE `username`= '$checkName'";
         $result = mysqli_query($conn, $sql);
@@ -77,43 +33,80 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $myObj->massaage = $massage;
         $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         echo $myJSON;
+    }elseif ($_GET['int'] == "logout") {
+        $_SESSION['login_user'] = null;
+        header("Location: login.php");
+        exit();
     }
 }
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    if ($_POST['int'] == "updateUserInfo") {
 
-    $target_dir = "uploads/".$username."/";
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true);
+
+        $chagedusername = $_POST['username'];
+        $full_name = $_POST['full_name'];
+        $dob = $_POST['dob'];
+        $number = $_POST['number'];
+        $email = $_POST['email'];
+
+
+
+        if (mysqli_num_rows(mysqli_query($conn, "SELECT id FROM `users` WHERE `users`.`username`= '$chagedusername'")) == 0) {
+            $conn->query("UPDATE `users` SET `username` = '$chagedusername' WHERE `users`.`id` = $userid");
+        }
+
+        $sql = "UPDATE `users` SET `full_name`='$full_name',`dob`='$dob',`number`='$number',`email`='$email' WHERE `users`.`id`='$userid'";
+        if ($conn->query($sql) === TRUE) {
+            $massage = "Info updated successfuly";
+            $success = true;
+        } else {
+            $massage = "Error: " . $sql . "<br>" . $conn->error;
+            $success = false;
+        }
+
+        $myObj = new stdClass();
+        $myObj->success = $success;
+        $myObj->massaage = $massage;
+        $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo $myJSON;
     }
 
-    if ($_FILES['file']['error'] > 0) {
-        echo 'Error: ' . $_FILES['file']['error'] . '<br>';
-    } else {
+    if ($_POST['int'] == "uploadImage") {
+        $target_dir = "uploads/" . $userid . "/";
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
 
-        $filepath =  $target_dir."profile_pic_". rand() . $_FILES['file']['name'];
-        
-        if (move_uploaded_file($_FILES['file']['tmp_name'],$filepath)) {
-        
-           
+        if ($_FILES['file']['error'] > 0) {
+            echo 'Error: ' . $_FILES['file']['error'] . '<br>';
+        } else {
 
-            $sql = "UPDATE `users` SET `profile_pic` = '$filepath' WHERE `username`= '$username'";
+            $filepath =  $target_dir . "profile_pic_" . rand() . $_FILES['file']['name'];
 
-            if ($conn->query($sql) === TRUE) {
-                $massage = "Image Uploaded successfuly";
-                $success = true;
-            } else {
-                $massage = "Error: " . $sql . "<br>" . $conn->error;
-                $success = false;
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $filepath)) {
+
+
+
+                $sql = "UPDATE `users` SET `profile_pic` = '$filepath' WHERE `id`= '$userid'";
+
+                if ($conn->query($sql) === TRUE) {
+                    $massage = "Image Uploaded successfuly";
+                    $success = true;
+                } else {
+                    $massage = "Error: " . $sql . "<br>" . $conn->error;
+                    $success = false;
+                }
+
+                $myObj = new stdClass();
+                $myObj->massage = $massage;
+                $myObj->success = $success;
+
+                $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                echo $myJSON;
             }
-
-            $myObj = new stdClass();
-            $myObj->massage = $massage;
-            $myObj->success = $success;
-
-            $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            echo $myJSON;
         }
     }
 }

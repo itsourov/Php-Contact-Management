@@ -9,7 +9,7 @@ if ($_SESSION['login_user'] == null) {
 } else {
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
-        $sql = "SELECT * FROM `contacts` WHERE `parent_user`= '$username' AND `id`= '$id'";
+        $sql = "SELECT * FROM `contacts` WHERE `parent_user`= '$userid' AND `id`= '$id'";
         $result = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($result);
         if (mysqli_num_rows($result) != 1) {
@@ -54,7 +54,7 @@ if ($_SESSION['login_user'] == null) {
         <table class="mx-auto table table-striped info-table text-start">
             <?php
 
-            echo "<tr> <td>Full Name</td><td>" . $row['full_name'] . "</td></tr>";
+            echo "<tr class='text-break'> <td>Full Name</td><td>" . $row['full_name'] . "</td></tr>";
             echo "<tr> <td>Date of birth</td><td>" . $row['date_of_birth'] . "</td></tr>";
             echo "<tr> <td>Number</td><td>" . $row['number'] . "</td></tr>";
             echo "<tr> <td>Number of friends</td><td>" . mysqli_num_rows(mysqli_query($conn, "SELECT id FROM `contacts` WHERE `parent_user`= '$username'")) . "</td></tr>";

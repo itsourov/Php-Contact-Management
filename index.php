@@ -1,19 +1,17 @@
 <?php
 session_start();
-include("./config.php");
+include 'config.php';
 
 
 if ($_SESSION['login_user'] == null) {
     header("Location: login.php");
     exit();
 } else {
-    $sql = "SELECT * FROM `users` WHERE `users`.`username` = '$username'";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
+    $row = $userRow;
 }
-
-
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +21,6 @@ if ($_SESSION['login_user'] == null) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Dash</title>
 </head>
 
@@ -34,19 +31,22 @@ if ($_SESSION['login_user'] == null) {
     <div class="gray">
 
     </div>
-    <div class="container white-box ">
+    <div class="container white-box  position-relative">
         <div class="image-box  mx-auto position-relative">
             <img class="img-fluid shadow" id="blah" src="<?php echo $siteUrl . $row['profile_pic']; ?>" alt="">
             <div id="spinner" class="spinner-grow text-secondary loader img-fluid" role="status" style="display: none;">
 
             </div>
-            <div class="upload-btn" style="display: none;">
-                <input type="file" accept="image/*" id="imgInp" name="fileToUpload" multiple>
+
+            <div class="upload-btn" style="display: none;" id="uploadBtn">
+                <input type="file" accept="image/*" id="imageInput" name="fileToUpload" multiple>
             </div>
-
-
-
-            <button onclick="enableEdit()" class="edit-btn btn btn-success btn-sm rounded-0" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button>
+        </div>
+        <div class="progress info-table mx-auto" id="progress-bar-wraper" style=" display:none;">
+            <div class="progress-bar" id="progress-bar-file1" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+        </div>
+        <div id="alert" class="alert alert-success info-table mx-auto" role="alert" style="display: none;">
+            Image uploaded successfuly!
         </div>
         <div class="name">
             <h3 class="title"><?php echo  $row['full_name']; ?></h3>
@@ -59,11 +59,11 @@ if ($_SESSION['login_user'] == null) {
 
                 <tr>
                     <td>Full Name</td>
-                    <td><input type="text" name="full_name" value="<?php echo $row['full_name']; ?> " disabled></td>
+                    <td><input type="text" name="full_name" value="<?php echo $row['full_name']; ?>" disabled></td>
                 </tr>
                 <tr>
                     <td>Username</td>
-                    <td><input type="text" id="username" name="username" value="<?php echo  $row['username']; ?>" disabled>
+                    <td><input type="text" id="username" name="username" value="<?php echo  $row['username']; ?>" onchange="checkUsername();" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" disabled>
                         <div class="spinner-border text-info" id="spinner" role="status" style="display: none;">
 
                         </div>
@@ -82,29 +82,30 @@ if ($_SESSION['login_user'] == null) {
                 </tr>
                 <tr>
                     <td>Number</td>
-                    <td><input type="text" name="number" value="<?php echo $row['number']; ?> " disabled></td>
+                    <td><input type="text" name="number" value="<?php echo $row['number']; ?>" disabled></td>
                 </tr>
                 <tr>
                     <td>Emaile</td>
-                    <td><input type="text" name="email" value="<?php echo $row['email']; ?> " disabled></td>
+                    <td><input type="text" name="email" value="<?php echo $row['email']; ?>" disabled></td>
                 </tr>
                 <tr>
                     <td>Number of friends</td>
-                    <td><input type="text" value="<?php echo mysqli_num_rows(mysqli_query($conn, "SELECT id FROM `contacts` WHERE `parent_user`= '$username'")); ?> " disabled></td>
+                    <td><?php echo mysqli_num_rows(mysqli_query($conn, "SELECT id FROM `contacts` WHERE `parent_user`= '$userid'")); ?></td>
                 </tr>
 
 
 
             </table>
             <div id="buttons" class=" mx-auto text-center" style="display: none;">
-
-                <button type="button" class="btn btn-warning m-1" onclick="disableEdit()">Cancel</button>
-                <button type="button" class="btn btn-success m-1" id="upload" value="Save">Save</button>
+                <input type="hidden" name="int" value="updateUserInfo">
+                <button type="button" class="btn btn-warning m-1" onclick="resetForm()">Cancel</button>
+                <button type="button" class="btn btn-success m-1" id="upload" onclick="submitValue()" value="Save">Save</button>
 
 
             </div>
         </form>
 
+        <img src="images/edit.svg" alt="" class="edit-btn img-fluid shadow" onclick="enableEdit()">
     </div>
 
     <style>
@@ -155,7 +156,8 @@ if ($_SESSION['login_user'] == null) {
 
 
         .info-table {
-            max-width: 400px;
+            max-width: 95%;
+            width: 400px;
         }
 
         .info-table input {
@@ -169,11 +171,20 @@ if ($_SESSION['login_user'] == null) {
             border-color: #00000000;
         }
 
-        .edit-btn {
+        .info-table tr {
+            width: 100%;
+        }
 
+        .edit-btn {
             position: absolute;
-            bottom: 35px;
-            right: -40px;
+            top: 5%;
+            right: 5%;
+            width: 30px;
+            cursor: pointer;
+        }
+
+        .edit-btn:hover {
+            transform: scale(110%);
         }
 
         .upload-btn {
@@ -208,99 +219,157 @@ if ($_SESSION['login_user'] == null) {
         }
     </style>
 
-
-    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-
     <script>
+        function resetForm() {
+            document.getElementById("info-table").reset();
+            disableEdit();
+        }
+
         function enableEdit() {
-            $("input").prop('disabled', false);
-
-            $("#buttons").css("display", "block");
-            $(".upload-btn").css("display", "block");
-
-
+            var inputs = document.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type != 'submit') {
+                    inputs[i].disabled = false;
+                }
+            }
+            document.getElementById('buttons').style.display = "block"
+            document.getElementById('uploadBtn').style.display = "block"
         }
 
         function disableEdit() {
-            $("input").prop('disabled', true);
-
-            $("#buttons").css("display", "none");
-            $(".upload-btn").css("display", "none");
-            $("#spinner").css("display", "None");
-            $("#info-table")[0].reset();
-            $('#username').attr("class", "");
-
-        }
-
-        $('#username').on('input', function(e) {
-            $("#spinner").css("display", "block");
-            var input = $(this);
-            var val = input.val();
-
-            $.ajax({
-                url: "api.php?int=checkUsername&checkName=" + val,
-                type: 'GET',
-                dataType: 'json', // added data type
-                success: function(res) {
-                    $("#spinner").css("display", "none");
-
-                    if (res.available) {
-                        $('#username').attr("class", "form-control is-valid");
-                        $('#valid-feedback').html(res.massaage);
-                    } else {
-                        $('#username').attr("class", "form-control is-invalid");
-                        $('#invalid-feedback').html(res.massaage);
-                    }
+            var inputs = document.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].type != 'submit') {
+                    inputs[i].disabled = true;
                 }
-            });
-
-
-        });
-
-        var imageSelected = false;
-
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                    $('#blah').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-                $("#spinner").css("display", "block");
-                imageSelected = true;
             }
+            document.getElementById('buttons').style.display = "none"
+            document.getElementById('buttons').style.display = "none"
+            username.className = '';
+
+
         }
 
-        $("#imgInp").change(function() {
-            readURL(this);
 
-            var file_data = $('#imgInp').prop('files')[0];
-            var form_data = new FormData();
-            form_data.append('file', file_data);
+        // username cheching system
+        var username = document.getElementById('username');
 
-            $.ajax({
-                url: 'api.php', // point to server-side PHP script 
-                dataType: 'json', // what to expect back from the PHP script, if anything
-                cache: false,
-                contentType: false,
-                processData: false,
-                data: form_data,
-                type: 'post',
-             
-                success: function(output) {
-                    alert(output.massage); // display response from the PHP script, if any
-                    $("#spinner").css("display", "none");
+        function checkUsername() {
+
+
+            username.classList.add("form-control");
+
+            fetch("api.php?int=checkUsername&checkName=" + username.value)
+            .then(function(response) {
+                return response.json();
+            }).then(function(data) {
+
+
+                if (data.available) {
+                    username.classList.remove("is-invalid");
+                    username.classList.add("is-valid");
+                    document.getElementById("valid-feedback").innerHTML = data.massaage;
+                } else {
+                    username.classList.remove("is-valid");
+                    username.classList.add("is-invalid");
+                    document.getElementById("invalid-feedback").innerHTML = data.massaage;
+                }
+
+
+            }).catch(function() {
+                console.log("Booo");
+            });
+
+        }
+
+        function submitValue() {
+
+            const form = document.querySelector('form');
+            const data = Object.fromEntries(new FormData(form).entries());
+            console.log(data);
+
+            const url = "api.php";
+            fetch(url, {
+                method: "POST",
+                body: new FormData(document.getElementById("info-table")),
+
+            }).then(
+                response => response.text() // .json(), etc.
+                // same as function(response) {return response.text();}
+
+            ).then(
+                html => console.log(html),
+                disableEdit()
+
+            );
+        }
+
+
+        let chooseImg = document.getElementById('imageInput'),
+            img = document.getElementById('blah'),
+            finished = function(e) {
+                URL.revokeObjectURL(img.src); //clean up
+            };
+
+        img.onload = finished;
+        img.onerror = finished;
+
+        chooseImg.addEventListener("change", function(e) {
+            if (document.getElementById('imageInput').files[0].size < 1000000) {
+                img.src = URL.createObjectURL(e.target.files[0]);
+                postFile();
+                document.getElementById('spinner').style.display = "block"
+            } else {
+                alert("image is more than 1 mb");
+            }
+
+        }, false);
+
+
+
+        function postFile() {
+            var formdata = new FormData();
+
+            formdata.append('file', document.getElementById('imageInput').files[0]);
+            formdata.append('int', "uploadImage");
+
+            var request = new XMLHttpRequest();
+
+            request.upload.addEventListener('progress', function(e) {
+                var file1Size = document.getElementById('imageInput').files[0].size;
+                console.log(file1Size);
+                document.getElementById('progress-bar-wraper').style.display = "block"
+                if (e.loaded <= file1Size) {
+                    var percent = Math.round(e.loaded / file1Size * 100);
+                    document.getElementById('progress-bar-file1').style.width = percent + '%';
+                    document.getElementById('progress-bar-file1').innerHTML = percent + '%';
+
+                    console.log("percent" + percent);
+                }
+
+                if (e.loaded == e.total) {
+                    document.getElementById('progress-bar-file1').style.width = '100%';
+                    document.getElementById('progress-bar-file1').innerHTML = '100%';
+                    document.getElementById('progress-bar-wraper').style.display = "none"
+                    document.getElementById('spinner').style.display = "none"
+
+                    document.getElementById('alert').style.display = "block"
+                    setTimeout(function() {
+                        document.getElementById('alert').style.display = "none"
+                    }, 4000);
+
+
+
+
                 }
             });
-            $('#imgInp').val(''); /* Clear the file container */
-        });
 
-        $('#upload').on('click', function() {
-
-        });
+            request.open('post', 'api.php');
+            request.timeout = 45000;
+            request.send(formdata);
+        }
     </script>
+
 
 </body>
 

@@ -1,17 +1,16 @@
 <?php
 session_start();
-include("./config.php");
+include("config.php");
 
 
 if ($_SESSION['login_user'] == null) {
     header("Location: login.php");
     exit();
 } else {
-    $sql = "SELECT * FROM `contacts` WHERE `parent_user`= '$username'";
+    $sql = "SELECT * FROM `contacts` WHERE `parent_user`= '$userid'";
     $result = mysqli_query($conn, $sql);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -43,7 +42,7 @@ if ($_SESSION['login_user'] == null) {
                     <div class="row">
 
                         <div class="col ">
-                            <img src="./image/user.png" alt="" class="img-fluid shadow">
+                            <img src="./images/user.png" alt="" class="img-fluid shadow">
                         </div>
                         <div class="col ">
                             <h4 class="title"><?php echo  $row['full_name']; ?></h4>
@@ -106,26 +105,6 @@ if ($_SESSION['login_user'] == null) {
     </style>
 
 
-
-    <!-- 
-    <table border="1">
-        <tr>
-            <td>Name</td>
-            <td>Date of birth</td>
-        </tr>
-        <?php
-        // $username = $_SESSION['login_user'];
-        // $sql = "SELECT * FROM `contacts` WHERE `parent_user`= '$username'";
-        // $result = mysqli_query($conn, $sql);
-        // foreach ($result as $row) {
-        //     echo "<tr> <td>" . $row['Name'] . "</td>";
-        //     echo "<td>" . $row['date_of_birth'] . "</td></tr>";
-        // }
-
-
-
-        ?>
-    </table> -->
 </body>
 
 </html>
