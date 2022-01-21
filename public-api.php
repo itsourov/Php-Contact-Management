@@ -185,9 +185,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $subject = 'Password Change Reqest';
 
-                    $headers  = "From: testsite <p1@sourov.net>\n";
-                    $headers .= "Cc: testsite <p1@sourov.net>\n";
-                    $headers .= "X-Sender: testsite <p1@sourov.net>\n";
+                    $headers  = "From: Sourov Biswas <p1@sourov.net>\n";
+                    $headers .= "Cc: Projet1 <p1@sourov.net>\n";
+                    $headers .= "X-Sender: Projet1 <p1@sourov.net>\n";
                     $headers .= 'X-Mailer: PHP/' . phpversion();
                     $headers .= "X-Priority: 1\n"; // Urgent message!
                     $headers .= "Return-Path: p1@sourov.net\n"; // Return path for errors
