@@ -271,6 +271,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             echo $myJSON;
         }
+    } elseif ($_POST['int'] == "new-pass") {
+        $db = $conn;
+        $errors = array();
+
+
+        $username = $_POST['username'];
+        $otp = $_POST['otp'];
+
+        $password_1 = mysqli_real_escape_string($db, $_POST['password_1']);
+
+
+
+
+        if (count($errors) == 0) {
+            $result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM `users`  WHERE `username`= '$username'"));
+
+            if ($result['token'] == $_POST['otp']) {
+
+                $password = md5($password_1);
+
+                $query = "UPDATE `users` SET `password` = '$password' WHERE `users`.`username` = '$username'";
+
+                if ($conn->query($query) === TRUE) {
+                    $result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT id FROM `users`  WHERE `username`= '$username'"));
+                    $_SESSION['login_user'] = $result['id'];
+
+                    $myObj = new stdClass();
+                    $myObj->status = true;
+                    $myObj->massage = "login successfull";
+                    $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                    echo $myJSON;
+                } else {
+                    $massage = "Error: " . $sql . "<br>" . $conn->error;
+                    array_push($errors, $massage);
+                }
+            } else {
+                array_push($errors, "OTP invalid");
+            }
+        }
+        if (count($errors) > 0) {
+
+
+            $myObj = new stdClass();
+            $myObj->status = false;
+            $myObj->errors = $errors;
+            $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            echo $myJSON;
+        }
     }
 }
 

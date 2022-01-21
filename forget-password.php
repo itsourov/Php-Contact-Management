@@ -88,6 +88,14 @@
             <button class="btn mb-3" onclick="otpCheck()" type="button">Verify</button>
         </form>
 
+        <form enctype="multipart/form-data" id="newPassForm" onsubmit="newPassSet(); return false;" style="display: none;">
+            <input class=" mb-3" type="text" placeholder="New Password" name="password">
+            <input type="hidden" name="int" value="new-pass">
+            <input type="hidden" name="username" id="hidderUsername">
+            <input type="hidden" name="otp" id="hiddenOtp">
+            <button class="btn mb-3" onclick="newPassSet()" type="button">Set New Password</button>
+        </form>
+
     </div>
 
 
@@ -127,7 +135,6 @@
                 console.log(this.responseText);
 
                 fadeout(document.getElementById("forgetPassForm"));
-
                 document.getElementById('hidderUsername').value = data.get('username');
                 document.getElementById('resetCodeForm').style.display = 'block';
 
@@ -164,11 +171,15 @@
                 // do something to response
                 console.log(this.responseText);
 
-              var res = JSON.parse(this.responseText);
+                var res = JSON.parse(this.responseText);
 
                 alert.style.display = "block"
                 if (res.status) {
                     alert.innerHTML = res.massage
+
+                    fadeout(document.getElementById("resetCodeForm"));
+                    document.getElementById('hidderUsername').value = data.get('username');
+                    document.getElementById('newPassForm').style.display = 'block';
                 } else {
                     var errorText = ""
                     res.errors.forEach(function(data, index) {
@@ -185,6 +196,34 @@
             };
             xhr.send(data);
 
+        }
+
+        function newPassSet() {
+
+            var data = new FormData(document.getElementById("newPassForm"));
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'public-api.php', true);
+            xhr.onload = function() {
+                // do something to response
+                console.log(this.responseText);
+
+                var res = JSON.parse(this.responseText);
+
+                alert.style.display = "block"
+                if (res.status) {
+                    alert.innerHTML = res.massage
+                } else {
+                    var errorText = ""
+                    res.errors.forEach(function(data, index) {
+
+                        errorText = errorText + "*" + data + "<br>"
+
+                    });
+                    alert.innerHTML = errorText
+                }
+            }
         }
     </script>
 
