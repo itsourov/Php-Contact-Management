@@ -183,7 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $to = $result['email'];
 
-                    $subject = 'Website Change Reqest';
+                    $subject = 'Password Change Reqest';
 
                     $headers  = "From: testsite <p1@sourov.net>\n";
                     $headers .= "Cc: testsite <p1@sourov.net>\n";
