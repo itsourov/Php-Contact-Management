@@ -59,6 +59,13 @@
         .btn:active {
             background: #395591;
         }
+
+        .hide {
+            display: none;
+        }
+    </style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
     </style>
     <title>Document</title>
 </head>
@@ -71,160 +78,141 @@
 
     <div class="whitebox mx-auto">
 
-        <div class="alert alert-primary" role="alert" id="alert">
+        <div class="alert alert-primary hide" role="alert" id="alert">
 
         </div>
         <h3 class="title mb-3">Reset Password</h3>
-        <form enctype="multipart/form-data" id="forgetPassForm" onsubmit="reqReset(); return false;">
-            <input class=" mb-3" type="text" placeholder="Username" name="username">
-            <input type="hidden" name="int" value="reset-pass">
-            <button class="btn mb-3" onclick="reqReset()" type="button">Request Reset</button>
-        </form>
 
-        <form enctype="multipart/form-data" id="resetCodeForm" onsubmit="otpCheck(); return false;" style="display: none;">
-            <input class=" mb-3" type="text" placeholder="OTP" name="otp">
-            <input type="hidden" name="int" value="otp-verification">
-            <input type="hidden" name="username" id="hidderUsername">
-            <button class="btn mb-3" onclick="otpCheck()" type="button">Verify</button>
-        </form>
 
-        <form enctype="multipart/form-data" id="newPassForm" onsubmit="newPassSet(); return false;" style="display: none;">
-            <input class=" mb-3" type="text" placeholder="New Password" name="password">
-            <input type="hidden" name="int" value="new-pass">
-            <input type="hidden" name="username" id="hidderUsername">
-            <input type="hidden" name="otp" id="hiddenOtp">
-            <button class="btn mb-3" onclick="newPassSet()" type="button">Set New Password</button>
-        </form>
+        <div id="requestOtpForm">
+            <input class="mb-3" type="text" placeholder="Username" id="username">
+            <button class="btn mb-3" onclick="reqReset()">Request Reset</button>
+        </div>
+
+        <div id="verifyOtpForm" class="hide">
+            <input class="mb-3" type="text" placeholder="OTP" id="otp">
+            <button class="btn mb-3" id="checkOtpBtn">Verify OTP</button>
+            <p class="message"><a href="forget-password.php">Request code again?</a></p>
+        </div>
+
+        <div id="setNewPassForm" class="hide">
+            <input class="mb-3" type="text" placeholder="New Password" id="password">
+            <button class="btn mb-3" id="setPassBtn">Set New Password</button>
+        </div>
 
     </div>
 
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
-    </style>
     <script>
-        var alert = document.getElementById('alert');
-        alert.style.display = "none"
+        //initialize all the variable
+
+        var alert = document.getElementById('alert')
+        var requestOtpForm = document.getElementById('requestOtpForm')
+        var verifyOtpForm = document.getElementById('verifyOtpForm')
+        var setNewPassForm = document.getElementById('setNewPassForm')
+
+        var checkOtpBtn = document.getElementById('checkOtpBtn')
+        var setPassBtn = document.getElementById('setPassBtn')
+
+        var username = document.getElementById('username')
+        var otp = document.getElementById('otp')
+        var password = document.getElementById('password')
 
 
 
-        function fadeout(element) { // 1
+
+
+        function reqReset() {
+            var data = new FormData();
+            data.append('int', 'reset-pass');
+            data.append('username', username.value);
+
+            callApi(data);
+
+            checkOtpBtn.addEventListener("click", function() {
+                data.set('int', 'otp-verification');
+                data.append('otp', otp.value);
+            
+                callApi(data);
+            });
+            setPassBtn.addEventListener("click", function() {
+                data.set('int', 'new-pass');
+                data.append('password', password.value);
+            
+                callApi(data);
+            });
+        }
+
+
+
+
+
+
+
+        function callApi(data) {
+
+
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'myapi.php', true);
+            xhr.onload = function() {
+                // do something to response
+                console.log(this.responseText);
+
+                var res = JSON.parse(this.responseText);
+
+                if (res.step == 1) {
+                    fadeout(requestOtpForm, verifyOtpForm);
+                }else if(res.step == 2) {
+                    fadeout(verifyOtpForm, setNewPassForm);
+                }else if(res.step == 3) {
+                    
+                    window.open("index.php" ,"_self");
+                }
+
+                showAlert(res);
+
+
+            };
+            xhr.send(data);
+        }
+
+        function showAlert(res) {
+
+            alert.style.display = "block"
+            if (res.status) {
+                alert.innerHTML = res.massage
+            } else {
+                var errorText = ""
+                res.errors.forEach(function(data, index) {
+                    errorText = errorText + "*" + data + "<br>"
+                });
+                alert.innerHTML = errorText
+            }
+
+        }
+
+
+
+
+
+
+        function fadeout(element, element2) { // 1
             element.style.opacity = 1; // 2
             let hidden_process = window.setInterval(function() { // 3
                 if (element.style.opacity > 0) { // 4
                     element.style.opacity = parseFloat(element.style.opacity - 0.01).toFixed(2); // 5 
                 } else {
+
+                    element2.style.display = 'block'; // 6 
                     element.style.display = 'none'; // 6 
                     element.style.opacity = 1;
                     console.log('1');
                     clearInterval(hidden_process);
                 }
             }, 4);
-
-
         };
-
-        function reqReset() {
-            var data = new FormData(document.getElementById("forgetPassForm"));
-
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'public-api.php', true);
-            xhr.onload = function() {
-                // do something to response
-                console.log(this.responseText);
-
-                fadeout(document.getElementById("forgetPassForm"));
-                document.getElementById('hidderUsername').value = data.get('username');
-                document.getElementById('resetCodeForm').style.display = 'block';
-
-                var res = JSON.parse(this.responseText);
-
-                alert.style.display = "block"
-                if (res.status) {
-                    alert.innerHTML = res.massage
-                } else {
-                    var errorText = ""
-                    res.errors.forEach(function(data, index) {
-
-                        errorText = errorText + "*" + data + "<br>"
-
-                    });
-                    alert.innerHTML = errorText
-                }
-
-
-
-
-            };
-            xhr.send(data);
-        }
-
-        function otpCheck() {
-
-            var data = new FormData(document.getElementById("resetCodeForm"));
-
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'public-api.php', true);
-            xhr.onload = function() {
-                // do something to response
-                console.log(this.responseText);
-
-                var res = JSON.parse(this.responseText);
-
-                alert.style.display = "block"
-                if (res.status) {
-                    alert.innerHTML = res.massage
-
-                    fadeout(document.getElementById("resetCodeForm"));
-                    document.getElementById('hidderUsername').value = data.get('username');
-                    document.getElementById('newPassForm').style.display = 'block';
-                } else {
-                    var errorText = ""
-                    res.errors.forEach(function(data, index) {
-
-                        errorText = errorText + "*" + data + "<br>"
-
-                    });
-                    alert.innerHTML = errorText
-                }
-
-
-
-
-            };
-            xhr.send(data);
-
-        }
-
-        function newPassSet() {
-
-            var data = new FormData(document.getElementById("newPassForm"));
-
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'public-api.php', true);
-            xhr.onload = function() {
-                // do something to response
-                console.log(this.responseText);
-
-                var res = JSON.parse(this.responseText);
-
-                alert.style.display = "block"
-                if (res.status) {
-                    alert.innerHTML = res.massage
-                } else {
-                    var errorText = ""
-                    res.errors.forEach(function(data, index) {
-
-                        errorText = errorText + "*" + data + "<br>"
-
-                    });
-                    alert.innerHTML = errorText
-                }
-            }
-        }
     </script>
 
 </body>
