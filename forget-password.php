@@ -81,6 +81,12 @@
             <button class="btn mb-3" onclick="reqReset()" type="button">Request Reset</button>
         </form>
 
+        <form enctype="multipart/form-data" id="resetCodeForm" onsubmit="otpCheck(); return false;" style="display: none;">
+            <input class=" mb-3" type="text" placeholder="OTP" name="otp" >
+            <input type="hidden" name="int" value="otp-verification">
+            <button class="btn mb-3" onclick="otpCheck()" type="button">Verify</button>
+        </form>
+
     </div>
 
 
@@ -118,6 +124,9 @@
             xhr.onload = function() {
                 // do something to response
                 console.log(this.responseText);
+
+                fadeout(document.getElementById("forgetPassForm"));
+               document.getElementById('resetCodeForm').style.display = 'block';
 
                 var res = JSON.parse(this.responseText);
 

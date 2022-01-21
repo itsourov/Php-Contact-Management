@@ -57,7 +57,7 @@ if ($_SESSION['login_user'] == null) {
             echo "<tr class='text-break'> <td>Full Name</td><td>" . $row['full_name'] . "</td></tr>";
             echo "<tr> <td>Date of birth</td><td>" . $row['date_of_birth'] . "</td></tr>";
             echo "<tr> <td>Number</td><td>" . $row['number'] . "</td></tr>";
-            echo "<tr> <td>Number of friends</td><td>" . mysqli_num_rows(mysqli_query($conn, "SELECT id FROM `contacts` WHERE `parent_user`= '$username'")) . "</td></tr>";
+          
 
             ?>
 

@@ -156,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif ($_POST['int'] == "reset-pass") {
         $db = $conn;
         $errors = array();
-        
+
         $username = mysqli_real_escape_string($db, $_POST['username']);
 
         if (empty($username)) {
@@ -165,126 +165,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
         if (count($errors) == 0) {
-        
-            $rand = rand(100000,999999);
+
+            $rand = rand(100000, 999999);
 
             $query = "SELECT * FROM users WHERE username='$username'";
             $results = mysqli_query($db, $query);
             if (mysqli_num_rows($results) == 1) {
                 $result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM `users`  WHERE `username`= '$username'"));
-            
-                $useridres =$result['id'];
+
+                $useridres = $result['id'];
 
                 $tokenUpdateSql = "UPDATE `users` SET `token` = '$rand' WHERE `users`.`id` = $useridres";
 
 
                 if ($conn->query($tokenUpdateSql) === TRUE) {
-                  
+
 
                     $to = $result['email'];
 
-$subject = 'Website Change Reqest';
+                    $subject = 'Website Change Reqest';
 
-$headers = "Content-Type: text/html; charset=UTF-8\r\n";
+                    $headers  = "From: testsite <p1@sourov.net>\n";
+                    $headers .= "Cc: testsite <p1@sourov.net>\n";
+                    $headers .= "X-Sender: testsite <p1@sourov.net>\n";
+                    $headers .= 'X-Mailer: PHP/' . phpversion();
+                    $headers .= "X-Priority: 1\n"; // Urgent message!
+                    $headers .= "Return-Path: p1@sourov.net\n"; // Return path for errors
+                    $headers .= "MIME-Version: 1.0\r\n";
+                    $headers .= "Content-Type: text/html; charset=iso-8859-1\n";
 
-$message = '
-<!doctype html>
-<html lang="en-US">
-
-<head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-    <title>Reset Password Email Template</title>
-    <meta name="description" content="Reset Password Email Template.">
-    <style type="text/css">
-        a:hover {text-decoration: underline !important;}
-    </style>
-</head>
-
-<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #f2f3f8;" leftmargin="0">
-    <!--100% body table-->
-    <table cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8"
-        style="@import url(https://fonts.googleapis.com/css?family=Rubik:300,400,500,700|Open+Sans:300,400,600,700); font-family: `Open Sans`, sans-serif;">
-        <tr>
-            <td>
-                <table style="background-color: #f2f3f8; max-width:670px;  margin:0 auto;" width="100%" border="0"
-                    align="center" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td style="height:80px;">&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align:center;">
-                          <a href="https://rakeshmandal.com" title="logo" target="_blank">
-                            <img width="60" src="https://i.ibb.co/hL4XZp2/android-chrome-192x192.png" title="logo" alt="logo">
-                          </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="height:20px;">&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0"
-                                style="max-width:670px;background:#fff; border-radius:3px; text-align:center;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
-                                <tr>
-                                    <td style="height:40px;">&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding:0 35px;">
-                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:`Rubik`,sans-serif;">You have
-                                            requested to reset your password</h1>
-                                        <span
-                                            style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
-                                        <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                            We cannot simply send you your old password. A unique link to reset your
-                                            password has been generated for you. To reset your password, click the
-                                            following link and follow the instructions.
-                                        </p>
-                                        <a href="javascript:void(0);"
-                                            style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Reset
-                                            Password</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="height:40px;">&nbsp;</td>
-                                </tr>
-                            </table>
-                        </td>
-                    <tr>
-                        <td style="height:20px;">&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align:center;">
-                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>www.rakeshmandal.com</strong></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="height:80px;">&nbsp;</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <!--/100% body table-->
-</body>
-
-</html>';
+                    $message = '
+                    <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+                    <div style="margin:50px auto;width:70%;padding:20px 0">
+                        <div style="border-bottom:1px solid #eee">
+                            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Project 1</a>
+                        </div>
+                        <p style="font-size:1.1em">Hi,</p>
+                        <p>Thank you for using our Site. Use the following OTP to complete your Password reset procedures. OTP is valid for 5 minutes</p>
+                        <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">'.$rand.'</h2>
+                        <p style="font-size:0.9em;">Regards,<br />Your Brand</p>
+                        <hr style="border:none;border-top:1px solid #eee" />
+                        <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                            <p>Project 1</p>
+                            <p>Sourov</p>
+                        </div>
+                    </div>
+                </div>';
 
 
-mail($to, $subject, $message, $headers);
-                    
-    
+                    mail($to, $subject, $message, $headers);
+
+
                     $myObj = new stdClass();
                     $myObj->status = true;
-                    $myObj->massage = "Password reset email was sent to your email ".hideEmailAddress($result['email']) ;
+                    $myObj->massage = "Password reset email was sent to your email " . hideEmailAddress($result['email']);
                     $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                     echo $myJSON;
                 } else {
                     $massage = "Error: " . $tokenUpdateSql . "<br>" . $conn->error;
                     array_push($errors, $massage);
                 }
-
-
-              
             } else {
                 array_push($errors, "username dont exists");
             }
@@ -304,13 +244,12 @@ mail($to, $subject, $message, $headers);
 
 function hideEmailAddress($email)
 {
-    if(filter_var($email, FILTER_VALIDATE_EMAIL))
-    {
+    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         list($first, $last) = explode('@', $email);
-        $first = str_replace(substr($first, '3'), str_repeat('*', strlen($first)-3), $first);
+        $first = str_replace(substr($first, '3'), str_repeat('*', strlen($first) - 3), $first);
         $last = explode('.', $last);
-        $last_domain = str_replace(substr($last['0'], '1'), str_repeat('*', strlen($last['0'])-1), $last['0']);
-        $hideEmailAddress = $first.'@'.$last_domain.'.'.$last['1'];
+        $last_domain = str_replace(substr($last['0'], '1'), str_repeat('*', strlen($last['0']) - 1), $last['0']);
+        $hideEmailAddress = $first . '@' . $last_domain . '.' . $last['1'];
         return $hideEmailAddress;
     }
 }
