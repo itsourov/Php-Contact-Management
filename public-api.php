@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (count($errors) == 0) {
         
-            $rand = rand();
+            $rand = rand(100000,999999);
 
             $query = "SELECT * FROM users WHERE username='$username'";
             $results = mysqli_query($db, $query);
@@ -180,6 +180,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 if ($conn->query($tokenUpdateSql) === TRUE) {
                   
+
+                    $to = $result['email'];
+
+$subject = 'Website Change Reqest';
+
+$headers = "From: " . strip_tags('p1@sourov.net') . "\r\n";
+$headers .= "Reply-To: ". strip_tags('p1@sourov.net') . "\r\n";
+$headers .= "CC: susan@example.com\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+
+$message = '<p><strong>This is strong text</strong> while this is not.</p>';
+
+
+mail($to, $subject, $message, $headers);
                     
     
                     $myObj = new stdClass();

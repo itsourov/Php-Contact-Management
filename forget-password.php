@@ -136,9 +136,7 @@
 
 
 
-                setTimeout(function() {
-                    fadeout(alert);
-                }, 5000);
+              
             };
             xhr.send(data);
         }
