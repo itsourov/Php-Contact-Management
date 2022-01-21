@@ -76,14 +76,15 @@
         </div>
         <h3 class="title mb-3">Reset Password</h3>
         <form enctype="multipart/form-data" id="forgetPassForm" onsubmit="reqReset(); return false;">
-            <input class=" mb-3" type="text" placeholder="Username" name="username" >
+            <input class=" mb-3" type="text" placeholder="Username" name="username">
             <input type="hidden" name="int" value="reset-pass">
             <button class="btn mb-3" onclick="reqReset()" type="button">Request Reset</button>
         </form>
 
         <form enctype="multipart/form-data" id="resetCodeForm" onsubmit="otpCheck(); return false;" style="display: none;">
-            <input class=" mb-3" type="text" placeholder="OTP" name="otp" >
+            <input class=" mb-3" type="text" placeholder="OTP" name="otp">
             <input type="hidden" name="int" value="otp-verification">
+            <input type="hidden" name="username" id="hidderUsername">
             <button class="btn mb-3" onclick="otpCheck()" type="button">Verify</button>
         </form>
 
@@ -106,7 +107,7 @@
                     element.style.opacity = parseFloat(element.style.opacity - 0.01).toFixed(2); // 5 
                 } else {
                     element.style.display = 'none'; // 6 
-                    element.style.opacity =1;
+                    element.style.opacity = 1;
                     console.log('1');
                     clearInterval(hidden_process);
                 }
@@ -126,7 +127,9 @@
                 console.log(this.responseText);
 
                 fadeout(document.getElementById("forgetPassForm"));
-               document.getElementById('resetCodeForm').style.display = 'block';
+
+                document.getElementById('hidderUsername').value = data.get('username');
+                document.getElementById('resetCodeForm').style.display = 'block';
 
                 var res = JSON.parse(this.responseText);
 
@@ -145,9 +148,43 @@
 
 
 
-              
+
             };
             xhr.send(data);
+        }
+
+        function otpCheck() {
+
+            var data = new FormData(document.getElementById("resetCodeForm"));
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'public-api.php', true);
+            xhr.onload = function() {
+                // do something to response
+                console.log(this.responseText);
+
+              var res = JSON.parse(this.responseText);
+
+                alert.style.display = "block"
+                if (res.status) {
+                    alert.innerHTML = res.massage
+                } else {
+                    var errorText = ""
+                    res.errors.forEach(function(data, index) {
+
+                        errorText = errorText + "*" + data + "<br>"
+
+                    });
+                    alert.innerHTML = errorText
+                }
+
+
+
+
+            };
+            xhr.send(data);
+
         }
     </script>
 

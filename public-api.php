@@ -202,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <p style="font-size:1.1em">Hi,</p>
                         <p>Thank you for using our Site. Use the following OTP to complete your Password reset procedures. OTP is valid for 5 minutes</p>
-                        <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">'.$rand.'</h2>
+                        <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">' . $rand . '</h2>
                         <p style="font-size:0.9em;">Regards,<br />Your Brand</p>
                         <hr style="border:none;border-top:1px solid #eee" />
                         <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
@@ -227,6 +227,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             } else {
                 array_push($errors, "username dont exists");
+            }
+        }
+        if (count($errors) > 0) {
+
+
+            $myObj = new stdClass();
+            $myObj->status = false;
+            $myObj->errors = $errors;
+            $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            echo $myJSON;
+        }
+    } elseif ($_POST['int'] == "otp-verification") {
+        $db = $conn;
+        $errors = array();
+
+
+        $username = $_POST['username'];
+
+
+
+
+        if (count($errors) == 0) {
+            $result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM `users`  WHERE `username`= '$username'"));
+
+            if ($result['token'] == $_POST['otp']) {
+
+                $myObj = new stdClass();
+                $myObj->status = true;
+                $myObj->massage = "Opt verified";
+                $myJSON = json_encode($myObj, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                echo $myJSON;
+            } else {
+                array_push($errors, "OTP invalid");
             }
         }
         if (count($errors) > 0) {
