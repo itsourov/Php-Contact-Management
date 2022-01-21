@@ -36,12 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $subject = 'Password Change Reqest';
 
-                    $headers  = "From: Sourov Biswas <sourovbuzz@gmail.com>\n";
-                    $headers .= "Cc: Projet1 <sourovbuzz@gmail.com>\n";
-                    $headers .= "X-Sender: Projet1 <sourovbuzz@gmail.com>\n";
+                    $headers  = "From: Sourov Biswas <p1@sourov.net>\n";
+                    $headers .= "Cc: Projet1 <p1@sourov.net>\n";
+                    $headers .= "X-Sender: Projet1 <p1@sourov.net>\n";
                     $headers .= 'X-Mailer: PHP/' . phpversion();
                     $headers .= "X-Priority: 1\n"; // Urgent message!
-                    $headers .= "Return-Path: sourovbuzz@gmail.com\n"; // Return path for errors
+                    $headers .= "Return-Path: p1@sourov.net\n"; // Return path for errors
                     $headers .= "MIME-Version: 1.0\r\n";
                     $headers .= "Content-Type: text/html; charset=iso-8859-1\n";
 
@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>';
 
 
-                    // mail($to, $subject, $message, $headers);
+                     mail($to, $subject, $message, $headers);
 
 
                     $myObj = new stdClass();
