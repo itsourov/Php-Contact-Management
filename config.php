@@ -1,4 +1,4 @@
-###<?php
+<?php
 
 $local = false;
 if ($local) {
@@ -39,7 +39,7 @@ $siteUrl = 'http://localhost/www/Bondhu/';
     
     
     
-    $siteUrl = 'https://p1.sourov.net/';
+    $siteUrl = 'https://test.itsourov.com/';
 }
 
 
