@@ -11,6 +11,6 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.2.0
       with:
-        server: ftp.sourov.net
+        server: ftp.itsourov.com
         username: test@itsourov.com
         password: ${{ secrets.ftp_password }}
