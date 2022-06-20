@@ -140,6 +140,7 @@ if (isset($userid)) {
             xhr.onload = function() {
                 // do something to response
                 console.log(this.responseText);
+alert(this.responseText);
 
                 var res = JSON.parse(this.responseText);
 
