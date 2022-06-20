@@ -62,7 +62,7 @@ if (isset($userid)) {
             background: #395591;
         }
     </style>
-    <title>Document</title>
+    <title>Document 1</title>
 </head>
 
 <body>
