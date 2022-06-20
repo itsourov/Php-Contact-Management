@@ -1,4 +1,4 @@
-<?php
+###<?php
 
 $local = false;
 if ($local) {
@@ -23,10 +23,10 @@ $siteUrl = 'http://localhost/www/Bondhu/';
 
 }else{
 
-    $servername = "localhost";
-    $sqlusername = "sourovne_project1";
+    $servername = "103.174.152.146";
+    $sqlusername = "sourovne_sourovne";
     $password = "power of 12";
-    $dbname = "sourovne_project1";
+    $dbname = "sourovne_test";
     
     // Create connection
     $conn = new mysqli($servername, $sqlusername, $password, $dbname);
