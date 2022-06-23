@@ -185,12 +185,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $subject = 'Password Change Reqest';
 
-                    $headers  = "From: Sourov Biswas <p1@sourov.net>\n";
+                    $headers  = "From: Sourov Biswas <test@itsourov.com>\n";
                     $headers .= "Cc: Projet1 <p1@sourov.net>\n";
-                    $headers .= "X-Sender: Projet1 <p1@sourov.net>\n";
+                    $headers .= "X-Sender: Projet1 <test@itsourov.com>\n";
                     $headers .= 'X-Mailer: PHP/' . phpversion();
                     $headers .= "X-Priority: 1\n"; // Urgent message!
-                    $headers .= "Return-Path: p1@sourov.net\n"; // Return path for errors
+                    $headers .= "Return-Path: test@itsourov.com\n"; // Return path for errors
                     $headers .= "MIME-Version: 1.0\r\n";
                     $headers .= "Content-Type: text/html; charset=iso-8859-1\n";
 
